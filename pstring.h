@@ -1,5 +1,5 @@
 typedef struct {
-    char len;
+    int len;
     char str[255];
 } Pstring;
 

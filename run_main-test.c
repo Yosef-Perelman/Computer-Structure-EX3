@@ -2,7 +2,6 @@
 #include "pstring.h"
 
 void run_main() {
-
     Pstring p1;
     Pstring p2;
     int len;
@@ -21,5 +20,4 @@ void run_main() {
     // select which function to run
     scanf("%d", &opt);
     run_func(opt, &p1, &p2);
-
 }
