@@ -1,6 +1,7 @@
 .section .rodata
 
-format_scan_chars:  .string    " %c"
+format_scan_char:  .string    " %c"
+format_scan_int:  .string    " %d"
 example_Print:      .string    "first char: %c, second char: %c\n"
 
 pstrlenPrint:       .string    "first pstring length: %d, second pstring length: %d\n"
@@ -54,11 +55,11 @@ run_func:
     subq    $32, %rsp
     movq    %rsi, -8(%rbp)
     movq    %rdx, -16(%rbp)
-    movq    $format_scan_chars, %rdi
+    movq    $format_scan_char, %rdi
     leaq    -24(%rbp), %rsi
     movq    $0, %rax
     call    scanf
-    movq    $format_scan_chars, %rdi
+    movq    $format_scan_char, %rdi
     leaq    -32(%rbp), %rsi
     movq    $0, %rax
     call    scanf
@@ -80,23 +81,42 @@ run_func:
     movq    $0, %rax
     call    printf
 
+    addq    $32, %rsp
     jmp     .L51
 
 .L53:
-    subq    $16, %rsp
-    movq    $format_scan_chars, %rdi
-    leaq    -8(%rbp), %rsi
+    subq    $32, %rsp
+    movq    %rsi, -8(%rbp)
+    movq    %rdx, -16(%rbp)
+    movl    (%rsi), %r12d    # save the first pstring length
+    movl    (%rdx), %r13d    # save the second pstring length
+    movq    $format_scan_int, %rdi
+    leaq    -24(%rbp), %rsi
     movq    $0, %rax
     call    scanf
-    movq    $format_scan_chars, %rdi
-    leaq    -16(%rbp), %rsi
+    movq    $format_scan_int, %rdi
+    leaq    -32(%rbp), %rsi
     movq    $0, %rax
     call    scanf
-    movq    $example_Print, %rdi
-    movq    -8(%rbp), %rsi
-    movq    -16(%rbp), %rdx
+    movq    -8(%rbp), %rdi  # pstring1 is in rdi
+    movq    -16(%rbp), %rsi  # pstring2 is in rsi
+    movq    -24(%rbp), %rdx  # start index is in rdx
+    movq    -32(%rbp), %rcx  # end index is in rcx
+    call    pstrijcpy
+
+    movq    $pstrijcpyPrint, %rdi
+    movl    %r12d, %esi
+    movq    %rax, %rdx
     movq    $0, %rax
     call    printf
+    movq    $pstrijcpyPrint, %rdi
+    movl    %r13d, %esi
+    movq    -16(%rbp), %r9
+    leaq    4(%r9), %rdx
+    movq    $0, %rax
+    call    printf
+
+    addq    $32, %rsp
     jmp .L51
 
 .L54:

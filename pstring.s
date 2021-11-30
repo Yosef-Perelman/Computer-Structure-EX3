@@ -1,3 +1,7 @@
+.section .rodata
+
+invalid_input:  .string "invalid input!\n"
+
 .text
 
     .globl	pstrlen
@@ -32,4 +36,43 @@ replaceChar:
 
 .L4:
     leaq    4(%rdi), %rax    # move to the start of the string
+    ret
+
+    .globl  pstrijcpy
+    .type   pstrijcpy, @function
+pstrijcpy:
+.VALIDATION_CHECK:
+    cmpl    (%rdi), %edx
+    jg      .INVALID_INPUT
+    cmpl    (%rsi), %edx
+    jg      .INVALID_INPUT
+    cmpl    (%rdi), %ecx
+    jg      .INVALID_INPUT
+    cmpl    (%rsi), %ecx
+    jg      .INVALID_INPUT
+
+    and     $0xff, %rdx
+    leaq    3(%rdi, %rdx), %rax    # move to the start of the pstring1
+    leaq    3(%rsi, %rdx), %r9    # move to the start of the pstring2
+
+.L5:
+    cmpl    %edx, %ecx  # compare i and j
+    je      .L8 # if they equal jump to L8
+    movb    (%r9), %r8b # if they not equal change the specific char
+    movb    %r8b, (%rax)
+    inc     %rax
+    inc     %r9
+    inc     %rdx
+    jmp     .L5
+
+.L8:
+    movb    (%r9), %r8b # if they not equal change the specific char
+    movb    %r8b, (%rax)
+    leaq    4(%rdi), %rax    # move to the start of the string
+    ret
+
+.INVALID_INPUT:
+    movq    $invalid_input, %rdi
+    movq    $0, %rax
+    call    printf
     ret
