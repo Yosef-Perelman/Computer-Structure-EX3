@@ -120,6 +120,31 @@ run_func:
     jmp .L51
 
 .L54:
+    subq    $16, %rsp
+    movq    %rsi, -8(%rbp)
+    movq    %rdx, -16(%rbp)
+    movl    (%rsi), %r12d    # save the first pstring length
+    movl    (%rdx), %r13d    # save the second pstring length
+
+    movq    %rsi, %rdi
+    movq    $0, %rax
+    call    swapCase
+    movq    $pstrijcpyPrint, %rdi
+    movl    %r12d, %esi
+    movq    %rax, %rdx
+    movq    $0, %rax
+    call    printf
+
+    movq    -16(%rbp), %rdi
+    movq    $0, %rax
+    call    swapCase
+    movq    $pstrijcpyPrint, %rdi
+    movl    %r13d, %esi
+    movq    %rax, %rdx
+    movq    $0, %rax
+    call    printf
+
+    addq    $16, %rsp
     jmp .L51
 
 .L55:

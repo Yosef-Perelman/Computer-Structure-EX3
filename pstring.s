@@ -56,7 +56,7 @@ pstrijcpy:
     leaq    3(%rsi, %rdx), %r9    # move to the start of the pstring2
 
 .L5:
-    cmpl    %edx, %ecx  # compare i and j
+    cmpl    %ecx, %edx  # compare i and j
     je      .L8 # if they equal jump to L8
     movb    (%r9), %r8b # if they not equal change the specific char
     movb    %r8b, (%rax)
@@ -75,4 +75,38 @@ pstrijcpy:
     movq    $invalid_input, %rdi
     movq    $0, %rax
     call    printf
+    ret
+
+    .globl  swapCase
+    .type   swapCase, @function
+swapCase:
+    movl    (%rdi), %esi
+    leaq    3(%rdi), %rax
+    xorq    %rdx, %rdx
+
+.L6:
+    cmpl    %edx, %esi
+    je      .L7
+    inc     %rdx
+    inc     %rax
+    cmpb    $0x5a, (%rax)  # check if char <= Z
+    jle     .UPPER_CASE
+    cmpb    $0x61, (%rax)  # check if char
+    jge     .LOWER_CASE
+    jmp     .L6
+
+.UPPER_CASE:
+    cmpb    $0x41, (%rax)
+    jl     .L6
+    addb    $0x20, (%rax)
+    jmp     .L6
+
+.LOWER_CASE:
+    cmpb    $0x7b, (%rax)
+    jg     .L6
+    subb    $0x20, (%rax)
+    jmp     .L6
+
+.L7:
+    leaq    4(%rdi), %rax    # move to the start of the string
     ret
