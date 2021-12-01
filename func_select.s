@@ -3,7 +3,7 @@
 format_scan_char:  .string    " %c"
 format_scan_int:  .string    " %d"
 example_Print:      .string    "first char: %c, second char: %c\n"
-invalid_input:  .string "invalid input!\n"
+invalid_input:  .string "invalid option!\n"
 
 pstrlenPrint:       .string    "first pstring length: %d, second pstring length: %d\n"
 replaceCharPrint:   .string    "old char: %c, new char: %c, first string: %s, second string: %s\n"
@@ -193,7 +193,7 @@ run_func:
     jmp .L51
 
 .L56:
-    movq    $invalid_input, %rdi
+    movq    $invalidPrint, %rdi
     movq    $0, %rax
     call    printf
     jmp     .L51

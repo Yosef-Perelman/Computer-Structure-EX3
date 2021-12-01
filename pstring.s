@@ -42,15 +42,25 @@ replaceChar:
     .globl  pstrijcpy
     .type   pstrijcpy, @function
 pstrijcpy:
+    push    %rbp
+    movq    %rsp, %rbp
+    subq    $8, %rsp
+    movq    %rdi, -8(%rbp)
+
 .VALIDATION_CHECK:
-    cmpb    (%rdi), %dl
+    movb    (%rdi), %r8b
+    movb    (%rsi), %r9b
+    and     $0xff, %r8
+    and     $0xff, %r8
+    dec     %r8
+    dec     %r9
+    cmpb    %r8b, %dl
     jg      .INVALID_INPUT
-    cmpb    (%rsi), %dl
+    cmpb    %r9b, %dl
     jg      .INVALID_INPUT
-    cmpb    (%rdi), %cl
+    cmpb    %r8b, %cl
     jg      .INVALID_INPUT
-    # cmpl    (%rsi), %ecx
-    cmpb    (%rsi), %cl
+    cmpb    %r9b, %cl
     jg      .INVALID_INPUT
 
     and     $0xff, %rdx
@@ -71,12 +81,19 @@ pstrijcpy:
     movb    (%r9), %r8b # if they not equal change the specific char
     movb    %r8b, (%rax)
     leaq    1(%rdi), %rax    # move to the start of the string
-    ret
+    jmp     .L12
 
 .INVALID_INPUT:
     movq    $invalid_input, %rdi
     movq    $0, %rax
     call    printf
+    movq    -8(%rbp), %rax    # move to the start of the string
+    addq    $1, %rax
+    jmp     .L12
+
+.L12:
+    addq    $8, %rsp
+    leave
     ret
 
     .globl  swapCase
@@ -105,7 +122,7 @@ swapCase:
     jmp     .L6
 
 .LOWER_CASE:
-    cmpb    $0x7b, (%rax)
+    cmpb    $0x7a, (%rax)
     jg     .L6
     subb    $0x20, (%rax)
     jmp     .L6
@@ -118,26 +135,36 @@ swapCase:
     .type   pstrijcmp, @function
 pstrijcmp:
 .CMP_VALIDATION_CHECK:
-    cmpb    (%rdi), %dl
+    movb    (%rdi), %r8b
+    movb    (%rsi), %r9b
+    and     $0xff, %r8
+    and     $0xff, %r8
+    dec     %r8
+    dec     %r9
+    cmpb    %r8b, %dl
     jg      .CMP_INVALID_INPUT
-    cmpb    (%rsi), %dl
+    cmpb    %r9b, %dl
     jg      .CMP_INVALID_INPUT
-    cmpb    (%rdi), %cl
+    cmpb    %r8b, %cl
     jg      .CMP_INVALID_INPUT
-    # cmpl    (%rsi), %ecx
-    cmpb    (%rsi), %cl
+    cmpb    %r9b, %cl
     jg      .CMP_INVALID_INPUT
 
     leaq    1(%rdi, %rdx), %rax
     leaq    1(%rsi, %rdx), %r10
     movl    %ecx, %r8d
     subl    %edx, %r8d
+    inc     %r8
     xor     %r9, %r9
 
 .L9:
     cmpl    %r8d, %r9d
-    jg      .EQUAL
-    cmpb    (%rsi), %r10b
+    je      .EQUAL
+    xorq    %rdi, %rdi
+    xorq    %rsi, %rsi
+    movb    (%rax), %dil
+    movb    (%r10), %sil
+    cmpb    %dil, %sil
     jg      .ONE_BIGGER
     jl      .TWO_BIGGER
     inc     %rax
