@@ -197,6 +197,7 @@ run_func:
     movq    $0, %rax
     call    printf
     jmp     .L51
+
 .L51:
     movq    %rbp, %rsp
     popq    %rbp

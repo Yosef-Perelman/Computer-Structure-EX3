@@ -43,13 +43,10 @@ replaceChar:
     .type   pstrijcpy, @function
 pstrijcpy:
 .VALIDATION_CHECK:
-    # cmpl    (%rdi), %edx
     cmpb    (%rdi), %dl
     jg      .INVALID_INPUT
-    # cmpl    (%rsi), %edx
     cmpb    (%rsi), %dl
     jg      .INVALID_INPUT
-    # cmpl    (%rdi), %ecx
     cmpb    (%rdi), %cl
     jg      .INVALID_INPUT
     # cmpl    (%rsi), %ecx
@@ -121,17 +118,18 @@ swapCase:
     .type   pstrijcmp, @function
 pstrijcmp:
 .CMP_VALIDATION_CHECK:
-    cmpl    (%rdi), %edx
+    cmpb    (%rdi), %dl
     jg      .CMP_INVALID_INPUT
-    cmpl    (%rsi), %edx
+    cmpb    (%rsi), %dl
     jg      .CMP_INVALID_INPUT
-    cmpl    (%rdi), %ecx
+    cmpb    (%rdi), %cl
     jg      .CMP_INVALID_INPUT
-    cmpl    (%rsi), %ecx
+    # cmpl    (%rsi), %ecx
+    cmpb    (%rsi), %cl
     jg      .CMP_INVALID_INPUT
 
-    leaq    4(%rdi, %rdx), %rax
-    leaq    4(%rsi, %rdx), %r10
+    leaq    1(%rdi, %rdx), %rax
+    leaq    1(%rsi, %rdx), %r10
     movl    %ecx, %r8d
     subl    %edx, %r8d
     xor     %r9, %r9
@@ -142,8 +140,10 @@ pstrijcmp:
     cmpb    (%rsi), %r10b
     jg      .ONE_BIGGER
     jl      .TWO_BIGGER
+    inc     %rax
     inc     %r10
-    inc     %rsi
+    inc     %r9
+    jmp     .L9
 
 .ONE_BIGGER:
     movq    $-1, %rax
