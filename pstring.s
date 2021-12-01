@@ -85,8 +85,9 @@ pstrijcpy:
     .globl  swapCase
     .type   swapCase, @function
 swapCase:
-    movl    (%rdi), %esi
-    leaq    3(%rdi), %rax
+    xorq    %rsi, %rsi
+    movb    (%rdi), %sil
+    leaq    (%rdi), %rax
     xorq    %rdx, %rdx
 
 .L6:
@@ -96,7 +97,7 @@ swapCase:
     inc     %rax
     cmpb    $0x5a, (%rax)  # check if char <= Z
     jle     .UPPER_CASE
-    cmpb    $0x61, (%rax)  # check if char
+    cmpb    $0x61, (%rax)  # check if char >= a
     jge     .LOWER_CASE
     jmp     .L6
 
@@ -113,7 +114,7 @@ swapCase:
     jmp     .L6
 
 .L7:
-    leaq    4(%rdi), %rax    # move to the start of the string
+    leaq    1(%rdi), %rax    # move to the start of the string
     ret
 
     .globl  pstrijcmp
