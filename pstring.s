@@ -43,18 +43,22 @@ replaceChar:
     .type   pstrijcpy, @function
 pstrijcpy:
 .VALIDATION_CHECK:
-    cmpl    (%rdi), %edx
+    # cmpl    (%rdi), %edx
+    cmpb    (%rdi), %dl
     jg      .INVALID_INPUT
-    cmpl    (%rsi), %edx
+    # cmpl    (%rsi), %edx
+    cmpb    (%rsi), %dl
     jg      .INVALID_INPUT
-    cmpl    (%rdi), %ecx
+    # cmpl    (%rdi), %ecx
+    cmpb    (%rdi), %cl
     jg      .INVALID_INPUT
-    cmpl    (%rsi), %ecx
+    # cmpl    (%rsi), %ecx
+    cmpb    (%rsi), %cl
     jg      .INVALID_INPUT
 
     and     $0xff, %rdx
-    leaq    4(%rdi, %rdx), %rax    # move to the start of the pstring1
-    leaq    4(%rsi, %rdx), %r9    # move to the start of the pstring2
+    leaq    1(%rdi, %rdx), %rax    # move to the start of the pstring1
+    leaq    1(%rsi, %rdx), %r9    # move to the start of the pstring2
 
 .L5:
     cmpl    %ecx, %edx  # compare i and j
@@ -69,7 +73,7 @@ pstrijcpy:
 .L8:
     movb    (%r9), %r8b # if they not equal change the specific char
     movb    %r8b, (%rax)
-    leaq    4(%rdi), %rax    # move to the start of the string
+    leaq    1(%rdi), %rax    # move to the start of the string
     ret
 
 .INVALID_INPUT:

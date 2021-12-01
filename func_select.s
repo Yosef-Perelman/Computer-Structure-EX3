@@ -92,39 +92,44 @@ run_func:
     jmp     .L51
 
 .L53:
-    subq    $32, %rsp
-    movq    %rsi, -8(%rbp)
-    movq    %rdx, -16(%rbp)
-    movl    (%rsi), %r12d    # save the first pstring length
-    movl    (%rdx), %r13d    # save the second pstring length
+    subq    $64, %rsp
+    movq    %rsi, -8(%rbp)  # save &pstring1
+    movq    %rdx, -16(%rbp) # save &pstring2
+    movb    (%rsi), %sil
+    movb    %sil, -24(%rbp)    # save pstring1 length
+    movb    (%rdx), %sil
+    movb    %sil, -32(%rbp)    # save pstring2 length
     movq    $format_scan_int, %rdi
-    leaq    -24(%rbp), %rsi
+    leaq    -40(%rbp), %rsi
     movq    $0, %rax
     call    scanf
     movq    $format_scan_int, %rdi
-    leaq    -32(%rbp), %rsi
+    leaq    -48(%rbp), %rsi
     movq    $0, %rax
     call    scanf
     movq    -8(%rbp), %rdi  # pstring1 is in rdi
     movq    -16(%rbp), %rsi  # pstring2 is in rsi
-    movq    -24(%rbp), %rdx  # start index is in rdx
-    movq    -32(%rbp), %rcx  # end index is in rcx
+    # maybe need 0xff
+    movq    -40(%rbp), %rdx  # start index is in rdx
+    movq    -48(%rbp), %rcx  # end index is in rcx
     movq    $0, %rax
     call    pstrijcpy
 
     movq    $pstrijcpyPrint, %rdi
-    movl    %r12d, %esi
+    movl    -24(%rbp), %esi
+    and     $0xff, %rsi
     movq    %rax, %rdx
     movq    $0, %rax
     call    printf
     movq    $pstrijcpyPrint, %rdi
-    movl    %r13d, %esi
+    movl    -32(%rbp), %esi
+    and     $0xff, %rsi
     movq    -16(%rbp), %r9
-    leaq    4(%r9), %rdx
+    leaq    1(%r9), %rdx
     movq    $0, %rax
     call    printf
 
-    addq    $32, %rsp
+    addq    $64, %rsp
     jmp .L51
 
 .L54:
