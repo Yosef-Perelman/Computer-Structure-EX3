@@ -3,6 +3,7 @@
 format_scan_char:  .string    " %c"
 format_scan_int:  .string    " %d"
 example_Print:      .string    "first char: %c, second char: %c\n"
+invalid_input:  .string "invalid input!\n"
 
 pstrlenPrint:       .string    "first pstring length: %d, second pstring length: %d\n"
 replaceCharPrint:   .string    "old char: %c, new char: %c, first string: %s, second string: %s\n"
@@ -12,15 +13,15 @@ invalidPrint:       .string    "invalid option!\n"
 
 .L10:
     .quad .L50 # case 50
-    .quad .L51 # case 51 - default
+    .quad .L56 # case 51 - invalid input
     .quad .L52 # case 52
     .quad .L53 # case 53
     .quad .L54 # case 54
     .quad .L55 # case 55
-    .quad .L51 # case 56 - default
-    .quad .L51 # case 57 - default
-    .quad .L51 # case 58 - default
-    .quad .L51 # case 59 - default
+    .quad .L56 # case 56 - invalid input
+    .quad .L56 # case 57 - invalid input
+    .quad .L56 # case 58 - invalid input
+    .quad .L56 # case 59 - invalid input
     .quad .L50 # case 60
 
 .text
@@ -30,26 +31,32 @@ invalidPrint:       .string    "invalid option!\n"
 run_func:
     pushq   %rbp
     movq    %rsp, %rbp
-    leaq    -50(%rdi), %rcx
-    cmpq    $10, %rcx
-    ja      .L51
-    jmp     *.L10(,%rcx,8)
+    subq    $50, %rdi
+    cmpq    $10, %rdi
+    ja      .L56
+    jmp     *.L10(,%rdi,8) # change rdx to rdi
 
 .L50:
-    movq    %rsi, %rdi
+    subq    $16, %rsp
+    movq    %rdx, -8(%rbp)  # save &pstring2
+    movq    %rsi, %rdi  # move &pstring1 to rdi
     movq    $0, %rax
     call    pstrlen
-    movq    %rax, %rsi
-    movq    %rdx, %rdi
+    movq    %rax, -16(%rbp) # save pstring1 length
+    movq    -8(%rbp), %rdi  # move &pstring2 to rdi
     movq    $0, %rax
     call    pstrlen
-    movq    %rax, %rdx
 
+    movl    %eax, %edx  # move pstring2 to rdx
+    and     $0xff, %rdx
     movq    $pstrlenPrint, %rdi
+    movl    -16(%rbp), %esi # move pstring1 to rsi
+    and     $0xff, %rsi
     movq    $0, %rax
     call    printf
 
-    jmp .L51
+    addq    $16, %rsp
+    jmp     .L51
 
 .L52:
     subq    $32, %rsp
@@ -174,6 +181,11 @@ run_func:
     addq    $32, %rsp
     jmp .L51
 
+.L56:
+    movq    $invalid_input, %rdi
+    movq    $0, %rax
+    call    printf
+    jmp     .L51
 .L51:
     movq    %rbp, %rsp
     popq    %rbp

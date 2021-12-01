@@ -52,8 +52,8 @@ pstrijcpy:
     jg      .INVALID_INPUT
 
     and     $0xff, %rdx
-    leaq    3(%rdi, %rdx), %rax    # move to the start of the pstring1
-    leaq    3(%rsi, %rdx), %r9    # move to the start of the pstring2
+    leaq    4(%rdi, %rdx), %rax    # move to the start of the pstring1
+    leaq    4(%rsi, %rdx), %r9    # move to the start of the pstring2
 
 .L5:
     cmpl    %ecx, %edx  # compare i and j
@@ -124,8 +124,8 @@ pstrijcmp:
     cmpl    (%rsi), %ecx
     jg      .CMP_INVALID_INPUT
 
-    leaq    3(%rdi, %rdx), %rax
-    leaq    3(%rsi, %rdx), %r10
+    leaq    4(%rdi, %rdx), %rax
+    leaq    4(%rsi, %rdx), %r10
     movl    %ecx, %r8d
     subl    %edx, %r8d
     xor     %r9, %r9
