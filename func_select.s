@@ -34,7 +34,7 @@ run_func:
     subq    $50, %rdi
     cmpq    $10, %rdi
     ja      .L56
-    jmp     *.L10(,%rdi,8) # change rdx to rdi
+    jmp     *.L10(,%rdi,8)
 
 .L50:
     subq    $16, %rsp
@@ -60,23 +60,23 @@ run_func:
 
 .L52:
     subq    $32, %rsp
-    movq    %rsi, -8(%rbp)
-    movq    %rdx, -16(%rbp)
+    movq    %rsi, -8(%rbp)  # save &pstring1
+    movq    %rdx, -16(%rbp) # save &pstring2
     movq    $format_scan_char, %rdi
     leaq    -24(%rbp), %rsi
     movq    $0, %rax
-    call    scanf
+    call    scanf   # get first char (aka "oldchar")
     movq    $format_scan_char, %rdi
     leaq    -32(%rbp), %rsi
     movq    $0, %rax
-    call    scanf
-    movq    -8(%rbp), %rdi  # pstring1 is in rdi
-    movq    -24(%rbp), %rsi
-    movq    -32(%rbp), %rdx
+    call    scanf   # get second char (aka "newchar")
+    movq    -8(%rbp), %rdi  # &pstring1 is in rdi
+    movq    -24(%rbp), %rsi # old char in rsi
+    movq    -32(%rbp), %rdx # new char in rdx
     movq    $0, %rax
     call    replaceChar
-    movq    %rax, -8(%rbp)   # pstring1 after the change is in rbp-8
-    movq    -16(%rbp), %rdi  # pstring2 is in rdi
+    movq    %rax, -8(%rbp)   # save pstring1 after the change
+    movq    -16(%rbp), %rdi  # &pstring2 is in rdi
     movq    -24(%rbp), %rsi
     movq    -32(%rbp), %rdx
     movq    $0, %rax

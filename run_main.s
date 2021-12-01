@@ -21,8 +21,6 @@ run_main:
     call    scanf
     movl    (%rsp), %edi
     and     $0xff, %rdi
-    leaq    257(%rsp, %rdi), %rax
-    movb    $10, (%rax)
 
     movq    $format_scan_int, %rdi
     leaq    256(%rsp), %rsi
@@ -34,8 +32,6 @@ run_main:
     call    scanf
     movl    (%rsp), %edi
     and     $0xff, %rdi
-    leaq    1(%rsp, %rdi), %rax
-    movb    $10, (%rax)
 
     movq    $format_scan_int, %rdi
     leaq    528(%rsp), %rsi
