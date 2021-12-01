@@ -110,3 +110,50 @@ swapCase:
 .L7:
     leaq    4(%rdi), %rax    # move to the start of the string
     ret
+
+    .globl  pstrijcmp
+    .type   pstrijcmp, @function
+pstrijcmp:
+.CMP_VALIDATION_CHECK:
+    cmpl    (%rdi), %edx
+    jg      .CMP_INVALID_INPUT
+    cmpl    (%rsi), %edx
+    jg      .CMP_INVALID_INPUT
+    cmpl    (%rdi), %ecx
+    jg      .CMP_INVALID_INPUT
+    cmpl    (%rsi), %ecx
+    jg      .CMP_INVALID_INPUT
+
+    leaq    3(%rdi, %rdx), %rax
+    leaq    3(%rsi, %rdx), %r10
+    movl    %ecx, %r8d
+    subl    %edx, %r8d
+    xor     %r9, %r9
+
+.L9:
+    cmpl    %r8d, %r9d
+    jg      .EQUAL
+    cmpb    (%rsi), %r10b
+    jg      .ONE_BIGGER
+    jl      .TWO_BIGGER
+    inc     %r10
+    inc     %rsi
+
+.ONE_BIGGER:
+    movq    $-1, %rax
+    ret
+
+.TWO_BIGGER:
+    movq    $1, %rax
+    ret
+
+.EQUAL:
+    movq    $0, %rax
+    ret
+
+.CMP_INVALID_INPUT:
+    movq    $invalid_input, %rdi
+    movq    $0, %rax
+    call    printf
+    movq    $-2, %rax
+    ret

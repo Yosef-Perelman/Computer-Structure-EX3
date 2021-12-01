@@ -102,6 +102,7 @@ run_func:
     movq    -16(%rbp), %rsi  # pstring2 is in rsi
     movq    -24(%rbp), %rdx  # start index is in rdx
     movq    -32(%rbp), %rcx  # end index is in rcx
+    movq    $0, %rax
     call    pstrijcpy
 
     movq    $pstrijcpyPrint, %rdi
@@ -148,6 +149,29 @@ run_func:
     jmp .L51
 
 .L55:
+    subq    $32, %rsp
+    movq    %rsi, -8(%rbp)
+    movq    %rdx, -16(%rbp)
+    movq    $format_scan_int, %rdi
+    leaq    -24(%rbp), %rsi
+    movq    $0, %rax
+    call    scanf
+    movq    $format_scan_int, %rdi
+    leaq    -32(%rbp), %rsi
+    movq    $0, %rax
+    call    scanf
+    movq    -8(%rbp), %rdi  # pstring1 is in rdi
+    movq    -16(%rbp), %rsi  # pstring2 is in rsi
+    movl    -24(%rbp), %edx  # start index is in rdx
+    movl    -32(%rbp), %ecx  # end index is in rcx
+    movq    $0, %rax
+    call    pstrijcmp
+
+    movq    $pstrijcmpPrint, %rdi
+    movq    %rax, %rsi
+    call    printf
+
+    addq    $32, %rsp
     jmp .L51
 
 .L51:
