@@ -1,3 +1,4 @@
+# 206344814 Yosef Perelman
 .section .rodata
 
 invalid_input:  .string "invalid input!\n"
@@ -7,36 +8,36 @@ invalid_input:  .string "invalid input!\n"
     .globl	pstrlen
     .type	pstrlen, @function
 pstrlen:
-    movl    (%rdi), %eax
+    movl    (%rdi), %eax    # return the string length
     ret
 
     .globl  replaceChar
     .type   replaceChar, @function
 replaceChar:
-    movb    (%rdi), %cl    # rcx is len of the string
+    movb    (%rdi), %cl     # move the length of the string to rdx
     and     $0xff, %rcx
-    leaq    1(%rdi), %rax    # move to the start of the string
-    xorq    %r8, %r8  # r8 is counter = i
+    leaq    1(%rdi), %rax   # move to the start of the string to rax
+    xorq    %r8, %r8        # r8 is counter
 
 .L1:
-    cmpq    %r8, %rcx # check the loop condition, if i = size of pstring finish the loop
+    cmpq    %r8, %rcx       # check the loop condition, if (r8 = size of the string) finish the loop
     je      .L4
-    cmpb    (%rax), %sil # compare the char with the old char, if true replace char
+    cmpb    (%rax), %sil    # otherwise, compare the chars and if they aren't equal jump to .L3
     jne     .L3
 
 .L2:
-    movb    %dl, (%rax)   # replace char with the new char
-    addq    $1, %rax
-    addq    $1, %r8
-    jmp     .L1
+    movb    %dl, (%rax)     # if they equal - do the swap
+    addq    $1, %rax        # go one char forward in the string
+    addq    $1, %r8         # increase the counter by 1
+    jmp     .L1             # go to the start of the loop
 
 .L3:
-    addq    $1, %rax
-    addq    $1, %r8
-    jmp     .L1
+    addq    $1, %rax        # go one char forward in the string
+    addq    $1, %r8         # increase the counter by 1
+    jmp     .L1             # go to the start of the loop
 
 .L4:
-    leaq    1(%rdi), %rax    # move to the start of the string
+    leaq    1(%rdi), %rax   # go back to the start of the string
     ret
 
     .globl  pstrijcpy
@@ -48,6 +49,7 @@ pstrijcpy:
     movq    %rdi, -8(%rbp)
 
 .VALIDATION_CHECK:
+    # check if the indexes are bigger than the strings lengths
     movb    (%rdi), %r8b
     movb    (%rsi), %r9b
     and     $0xff, %r8
@@ -64,24 +66,24 @@ pstrijcpy:
     jg      .INVALID_INPUT
 
     and     $0xff, %rdx
-    leaq    1(%rdi, %rdx), %rax    # move to the start of the pstring1
-    leaq    1(%rsi, %rdx), %r9    # move to the start of the pstring2
+    leaq    1(%rdi, %rdx), %rax   # go to the start of the pstring1
+    leaq    1(%rsi, %rdx), %r9    # go to the start of the pstring2
 
 .L5:
-    cmpl    %ecx, %edx  # compare i and j
-    je      .L8 # if they equal jump to L8
-    movb    (%r9), %r8b # if they not equal change the specific char
+    cmpl    %ecx, %edx      # compare i and j (rdx = i and rcx = j)
+    je      .L8             # if they equal jump to L8 (to change the last char and finish the function)
+    movb    (%r9), %r8b     # if they not equal change the specific char
     movb    %r8b, (%rax)
-    inc     %rax
-    inc     %r9
-    inc     %rdx
-    jmp     .L5
+    inc     %rax            # go one char forward in the first string
+    inc     %r9             # go one char forward in the second string
+    inc     %rdx            # i = i + 1
+    jmp     .L5             # go to the start of the loop
 
 .L8:
-    movb    (%r9), %r8b # if they not equal change the specific char
+    movb    (%r9), %r8b     # change the char
     movb    %r8b, (%rax)
-    leaq    1(%rdi), %rax    # move to the start of the string
-    jmp     .L12
+    leaq    1(%rdi), %rax   # go to the start of the string
+    jmp     .L12            # go to the finish of the function
 
 .INVALID_INPUT:
     movq    $invalid_input, %rdi
@@ -92,6 +94,7 @@ pstrijcpy:
     jmp     .L12
 
 .L12:
+    # end of function
     addq    $8, %rsp
     leave
     ret
@@ -100,41 +103,43 @@ pstrijcpy:
     .type   swapCase, @function
 swapCase:
     xorq    %rsi, %rsi
-    movb    (%rdi), %sil
-    leaq    (%rdi), %rax
-    xorq    %rdx, %rdx
+    movb    (%rdi), %sil    # length of the string in rsi
+    leaq    (%rdi), %rax    # rax point to the string
+    xorq    %rdx, %rdx      # rdx is counter
 
 .L6:
-    cmpl    %edx, %esi
-    je      .L7
-    inc     %rdx
-    inc     %rax
-    cmpb    $0x5a, (%rax)  # check if char <= Z
+    cmpl    %edx, %esi      # compare the index and the string length to check if the loop is over
+    je      .L7             # if they equal jump to .L7 to the end of function
+    inc     %rdx            # increase the counter by 1
+    inc     %rax            # go one char forward in the string
+    cmpb    $0x5a, (%rax)   # check if char <= Z
     jle     .UPPER_CASE
-    cmpb    $0x61, (%rax)  # check if char >= a
+    cmpb    $0x61, (%rax)   # check if char >= a
     jge     .LOWER_CASE
-    jmp     .L6
+    jmp     .L6             # go to the start of the loop
 
 .UPPER_CASE:
-    cmpb    $0x41, (%rax)
+    cmpb    $0x41, (%rax)   # check if char < A
     jl     .L6
-    addb    $0x20, (%rax)
-    jmp     .L6
+    addb    $0x20, (%rax)   # change the char to lower case
+    jmp     .L6             # go to the start of the loop
 
 .LOWER_CASE:
-    cmpb    $0x7a, (%rax)
+    cmpb    $0x7a, (%rax)   # check if char > z
     jg     .L6
-    subb    $0x20, (%rax)
-    jmp     .L6
+    subb    $0x20, (%rax)   # change the char to upper case
+jmp     .L6                 # go to the start of the loop
 
 .L7:
-    leaq    1(%rdi), %rax    # move to the start of the string
+    leaq    1(%rdi), %rax    # go to the start of the string
     ret
 
     .globl  pstrijcmp
     .type   pstrijcmp, @function
 pstrijcmp:
+
 .CMP_VALIDATION_CHECK:
+    # check if the indexes are bigger than the strings lengths
     movb    (%rdi), %r8b
     movb    (%rsi), %r9b
     and     $0xff, %r8
@@ -150,16 +155,19 @@ pstrijcmp:
     cmpb    %r9b, %cl
     jg      .CMP_INVALID_INPUT
 
-    leaq    1(%rdi, %rdx), %rax
-    leaq    1(%rsi, %rdx), %r10
-    movl    %ecx, %r8d
+    leaq    1(%rdi, %rdx), %rax # the first string in rax
+    leaq    1(%rsi, %rdx), %r10 # the second string in r10
+    movl    %ecx, %r8d      # the length of the loop in r8 (j - i)
     subl    %edx, %r8d
     inc     %r8
-    xor     %r9, %r9
+    xor     %r9, %r9        # r9 is counter
 
 .L9:
+    # compare the counter and the loop length, if they equal it means we move through all
+    # the substrings and they equal.
     cmpl    %r8d, %r9d
     je      .EQUAL
+    # compare the chars and jump to the right place
     xorq    %rdi, %rdi
     xorq    %rsi, %rsi
     movb    (%rax), %dil
@@ -167,10 +175,10 @@ pstrijcmp:
     cmpb    %dil, %sil
     jg      .ONE_BIGGER
     jl      .TWO_BIGGER
-    inc     %rax
-    inc     %r10
-    inc     %r9
-    jmp     .L9
+    inc     %rax            # go one char forward in the first substring
+    inc     %r10            # go one char forward in the second substring
+    inc     %r9             # increase the counter by 1
+    jmp     .L9             # go to the start of the loop
 
 .ONE_BIGGER:
     movq    $-1, %rax
